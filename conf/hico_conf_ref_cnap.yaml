@@ -1,0 +1,67 @@
+
+# model name for saving results and model weights
+model_name: 'HICO_polymer_ref_cnap'
+home_dir: '/Users/jakravit/Desktop/WaterQuality/'
+model_dir: 'experiments/'
+
+# model and training info
+batch_info:
+ model: 'de'  # options: ('mdn', 'de')
+ n_hidden: 100  # number of hidden units
+ num_gaussians: 5  # MDN: # of Gaussians in mixture; DE: # members in ensemble
+ epochs: 1000  # number of training epochs
+ batch_size: 'full'  # batch size, full == use entire training dataset
+ lrate: 0.001  # learning rate
+ lr_decay: 0  #0.997  # learning rate decay, set to 0 if unwanted (lr = lr_decay**epoch)
+ weight_decay: 10.0e-5  # weight decay (L2 penalty), set to 0 if unwanted
+ test_split: 0.1  # ratio for test set
+ val_split: 0.1  # ratio for test set
+ logSumExp: true  # only used for MDN; alt. loss function based on: https://deep-and-shallow.com/2021/03/20/mixture-density-networks-probabilistic-regression-for-uncertainty-estimation/
+ num_lin_layers: 10 # number of layers in the initial MLP or in each ensemble of the DE
+ mdn_mean_mixture: True  # only used for MDN; if True, mean est. is weighted by mixing coeff., o.w. from single Gaussian
+ predefined_split:  #'data/train_test_split.pkl' # leave blank to create new split
+ split_method: 'stratified'  # options: ('random', 'stratified', 'water_type') # how to define test/train/val splits
+ test_water_type: '' # only used for split_method = 'water_type'; options: ('random', 'CDOM', 'Cy', 'Euk', 'Mild', 'NAP', 'Oligo', 'Scum')
+ options: leave blank to use stratified split of same as test; if not random, test & val types should be different
+ results_as_log: true  # keep results in log(target)
+
+# sensor data info
+# see https://github.com/JAKravitz/JPL_WQ_ML/blob/main/TrainingData.ipynb for full list of targets
+sensor_data_info:
+ sensor: 'hico'  # which sensor you will train on
+ targets: ['cnap']  # target variable(s)
+ meta: null  # this is for when using top-of-atmosphere data, irrelevant
+ Xpca: null  # number of principal components to for dimensionality reduction of input bands, null if unwanted
+
+data:  
+ input_fpath: "data/hico_ref.csv"
+ eval_fpaths: ["data/Rrs_hico_polymer.csv", "data/Rrs_chl_matchups_polymer.csv"]
+ results_fpaths: #["TEST_DE_NEW_DATA/train_TEST_DE_NEW_DATA_results.pkl", "TEST_DE_NEW_DATA/test_TEST_DE_NEW_DATA_results.pkl"] #Comment out to use model_params instead
+
+
+# trained model for evaluation
+model:
+ param_fpath: ['TEST_DE_NEW_DATA_2/TEST_DE_NEW_DATA_2_0_2000.ckpt', 'TEST_DE_NEW_DATA_2/TEST_DE_NEW_DATA_2_1_2000.ckpt', 'TEST_DE_NEW_DATA_2/TEST_DE_NEW_DATA_2_2_2000.ckpt', 'TEST_DE_NEW_DATA_2/TEST_DE_NEW_DATA_2_3_2000.ckpt', 'TEST_DE_NEW_DATA_2/TEST_DE_NEW_DATA_2_4_2000.ckpt']
+ model_fpath: ""
+
+output:
+ scalers:
+  y_scaler_fname: "y_scaler.pkl"
+  x_scaler_fname: "x_scaler.pkl"
+ pca_fname: "pca.pkl"
+ split_fname: 'train_test_split.pkl'
+ model_out_dir: "data/"
+ out_dir: "water_qual_plots/"
+ evaluations: ["final"]
+ results_subdirs: ["total_sim", "total_insitu"] # ["train_sim", "test_sim"] #should match # of data/eval_fpaths OR data/results_fpaths
+ radar:
+  metrics: ["RMSE", "Bias", "R2", "MAPE"]
+ ece:
+  sigma_bins: [0.5,1,1.5,2,3]
+ feature_importance:
+  scores: ["r2"]
+ owt: False 
+ pis: False
+ predict:
+  train: False  # predict on a subset of the training data
+  outliers: False  # predict on outlier data
