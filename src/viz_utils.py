@@ -586,8 +586,10 @@ def generate_feature_importance_plot(conf, attr, output_path=None, feature_names
 
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111)
-
-        ax.bar(range(attr.shape[1]), np.squeeze(attr[i].numpy()), align='center')
+        
+        attrdata = np.squeeze(attr[i].numpy())
+        
+        ax.bar(range(attr.shape[1]), attrdata, align='center')
         ax.set_xlabel("Features")
         ax.set_ylabel("Attributions")
         ax.set_title("Feature Importance Using " + metric)
@@ -598,7 +600,8 @@ def generate_feature_importance_plot(conf, attr, output_path=None, feature_names
         fig.savefig(os.path.join(dir,"Feature_Importance_" + metric + "_.png"), dpi=300, bbox_inches="tight")
         plt.clf()
     plt.close()
-
+    
+    return attrdata
 
 def plot_bar_metric_by_water_type(results, conf, log, output_path=None):
 

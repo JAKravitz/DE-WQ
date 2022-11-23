@@ -244,7 +244,8 @@ for key in output_dict:
         config["batch_info"]["cuda"] = cuda
         sensor = config['sensor_data_info']['sensor']
         x_names = sensorData[sensor].filter(regex='^[0-9]').columns
-        eval_feature_importance(config, model, x_test_tensor, y_test, plot_dir, x_names)
+        attr = eval_feature_importance(config, model, x_test_tensor, y_test, plot_dir, x_names)
+        attr.to_csv(saved_model_dir + '/attr.csv')
     write_results(results, config, plot_dir, log_results) #write results and make plots
 
 if config['output']['predict']['outliers']:

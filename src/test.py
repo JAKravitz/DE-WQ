@@ -107,7 +107,10 @@ def eval_feature_importance(conf, model, x, y, output_path=None, feature_names =
             show_progress=True,
             additional_forward_args=y)
 
-        generate_feature_importance_plot(conf, attr, output_path, feature_names)
+        attrdata = generate_feature_importance_plot(conf, attr, output_path, feature_names)
+        attrdata = pd.DataFrame(attrdata)
+    
+    return attrdata
 
 
 def run_test(conf, log=True):
